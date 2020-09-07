@@ -14,7 +14,12 @@ class EclipseCollectionsTypeModifier extends TypeModifier {
         if (!type.isCollectionLikeType()) {
             JavaType collectionType = type.findSuperType(ImmutableCollection.class);
             if (collectionType != null) {
-                return CollectionLikeType.upgradeFrom(type, collectionType.containedType(0));
+                JavaType containedType = collectionType.containedType(0);
+                if (containedType == null) {
+                    // raw type, fall back to Object
+                    containedType = typeFactory.constructType(Object.class);
+                }
+                return CollectionLikeType.upgradeFrom(type, containedType);
             }
         }
         return type;
